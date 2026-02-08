@@ -25,7 +25,7 @@ local Window = WindUI:CreateWindow({
 -- TABS
 --------------------------------------------------
 Window:Tag({
-    Title = "v1.1",
+    Title = "v1.2",
     Icon = "rocket",
     Color = Color3.fromHex("#30ff6a"),
     Radius = 13,
