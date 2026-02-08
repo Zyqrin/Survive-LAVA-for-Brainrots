@@ -1,0 +1,160 @@
+--------------------------------------------------
+-- WIND UI
+--------------------------------------------------
+local WindUI = loadstring(game:HttpGet(
+    "https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"
+))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Zyqrin Hub || SLFB",
+    Icon = "rbxassetid://73349555895759",
+    Author = "by zyqrin",
+    KeySystem = {                                                   
+        Note = "Example Key System. With platoboost.",              
+        API = {                                                     
+            { -- PlatoBoost
+                Type = "platoboost",                                
+                ServiceId = 19724, -- service id
+                Secret = "7065f5da-64e9-4933-b1ae-f920906e66d0", -- platoboost secret
+            },                                                      
+        },                                                          
+    },                                                              
+})
+
+--------------------------------------------------
+-- TABS
+--------------------------------------------------
+Window:Tag({
+    Title = "v1.0",
+    Icon = "rocket",
+    Color = Color3.fromHex("#30ff6a"),
+    Radius = 13,
+})
+
+local MainTab = Window:Tab({
+    Title = "Main",
+    Icon = "tool-case",
+})
+
+local ManualSection = MainTab:Section({ Title = "MANUAL", Box = true, Opened = false })
+--------------------------------------------------
+-- SERVICES
+--------------------------------------------------
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local player = Players.LocalPlayer
+
+--------------------------------------------------
+-- STATE
+--------------------------------------------------
+local SelectedVariant = "Common"
+
+--------------------------------------------------
+-- BASE POSITION
+--------------------------------------------------
+local BASE_CFRAME = CFrame.new(-18.8, 4.3, 7.2)
+
+--------------------------------------------------
+-- BRAINROT FOLDERS
+--------------------------------------------------
+local BrainrotsFolder = Workspace.GameFolder:WaitForChild("Brainrots")
+
+local FolderMap = {
+    Common     = BrainrotsFolder:FindFirstChild("Common"),
+    Epic       = BrainrotsFolder:FindFirstChild("Epic"),
+    Legendary  = BrainrotsFolder:FindFirstChild("Legendary"),
+    Mythic     = BrainrotsFolder:FindFirstChild("Mythic"),
+    Rare       = BrainrotsFolder:FindFirstChild("Rare"),
+    Secret     = BrainrotsFolder:FindFirstChild("Secret"),
+    Celestial  = BrainrotsFolder:FindFirstChild("Celestial"),
+}
+
+--------------------------------------------------
+-- FUNCTIONS
+--------------------------------------------------
+local function getHRP()
+    local char = player.Character or player.CharacterAdded:Wait()
+    return char:WaitForChild("HumanoidRootPart")
+end
+
+local function teleport(cf)
+    local hrp = getHRP()
+    hrp.CFrame = cf
+end
+
+local function getRandomBrainrot()
+    local folder = FolderMap[SelectedVariant]
+    if not folder then return end
+
+    local list = folder:GetChildren()
+    if #list == 0 then return end
+
+    return list[math.random(1, #list)]
+end
+
+local function teleportToBrainrot()
+    local brainrot = getRandomBrainrot()
+    if not brainrot or not brainrot:IsA("Model") then return end
+
+    local cf
+    if brainrot.PrimaryPart then
+        cf = brainrot.PrimaryPart.CFrame
+    else
+        cf = brainrot:GetModelCFrame()
+    end
+
+    teleport(cf + Vector3.new(0, 5, 0))
+end
+
+--------------------------------------------------
+-- AUTO TP AFTER RESPAWN
+--------------------------------------------------
+player.CharacterAdded:Connect(function()
+    task.wait(0.4)
+    teleportToBrainrot()
+end)
+
+--------------------------------------------------
+-- UI : BRAINROT TAB
+--------------------------------------------------
+ManualSection:Dropdown({
+    Title = "Brainrot Variant",
+    Desc = "Pilih 1 jenis brainrot",
+    Values = {
+        "Common",
+        "Epic",
+        "Legendary",
+        "Mythic",
+        "Rare",
+        "Secret",
+        "Celestial"
+    },
+    Value = "Common",
+    Multi = false,
+    AllowNone = false,
+    Callback = function(option)
+        SelectedVariant = option
+    end
+})
+
+ManualSection:Button({
+    Title = "TP Brainrot",
+    Desc = "Teleport ke brainrot sesuai pilihan",
+    Icon = "zap",
+    Callback = function()
+        teleportToBrainrot()
+    end
+})
+
+--------------------------------------------------
+-- UI : BASE TAB
+--------------------------------------------------
+ManualSection:Button({
+    Title = "TP Base",
+    Desc = "Teleport ke base",
+    Icon = "home",
+    Callback = function()
+        teleport(BASE_CFRAME)
+    end
+})
