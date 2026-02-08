@@ -25,7 +25,7 @@ local Window = WindUI:CreateWindow({
 -- TABS
 --------------------------------------------------
 Window:Tag({
-    Title = "v1.0",
+    Title = "v1.1",
     Icon = "rocket",
     Color = Color3.fromHex("#30ff6a"),
     Radius = 13,
@@ -41,20 +41,39 @@ local MainTab = Window:Tab({
     Icon = "tool-case",
 })
 
+local MenuTab = Window:Tab({
+    Title = "Menu",
+    Icon = "rocket",
+})
+
 local ManualSection = MainTab:Section({ Title = "MANUAL", Box = true, Opened = false })
+
+local BUYSection = MenuTab:Section({ Title = "BUY", Box = true, Opened = false })
+
+local SELLSection = MenuTab:Section({ Title = "SELL", Box = true, Opened = false })
+
+local UPSection = MenuTab:Section({ Title = "UPGRADE BASE", Box = true, Opened = false })
 --------------------------------------------------
 -- SERVICES
 --------------------------------------------------
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
-
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Events = ReplicatedStorage:WaitForChild("Events")
+local SellEvent    = Events:WaitForChild("SellDialogue")
+local SpeedEvent   = Events:WaitForChild("Speed")
+local UpgradeEvent = Events:WaitForChild("Upgrade")
 local player = Players.LocalPlayer
 
 --------------------------------------------------
 -- STATE
 --------------------------------------------------
 local SelectedVariant = "Common"
+local AutoSell    = false
+local AutoSpeed   = false
+local AutoUpgrade = false
 
+local SpeedValue = 1
 --------------------------------------------------
 -- BASE POSITION
 --------------------------------------------------
@@ -155,6 +174,46 @@ InfoTab:Button({
     end
 })
 
+task.spawn(function()
+    while task.wait(1.5) do
+        if AutoSell then
+            pcall(function()
+                SellEvent:InvokeServer("SellAll")
+            end)
+        end
+    end
+end)
+
+--------------------------------------------------
+-- AUTO BUY SPEED LOOP
+--------------------------------------------------
+task.spawn(function()
+    while task.wait(2) do
+        if AutoSpeed then
+            pcall(function()
+                SpeedEvent:InvokeServer("Speed", SpeedValue)
+            end)
+        end
+    end
+end)
+
+--------------------------------------------------
+-- AUTO UPGRADE ALL PLOTS (1–30)
+--------------------------------------------------
+task.spawn(function()
+    while task.wait(2) do
+        if AutoUpgrade then
+            for plot = 1, 30 do
+                if not AutoUpgrade then break end
+                pcall(function()
+                    UpgradeEvent:InvokeServer(plot)
+                end)
+                task.wait(0.25)
+            end
+        end
+    end
+end)
+
 
 --------------------------------------------------
 -- UI : BRAINROT TAB
@@ -197,5 +256,50 @@ ManualSection:Button({
     Icon = "home",
     Callback = function()
         teleport(BASE_CFRAME)
+    end
+})
+
+SELLSection:Toggle({
+    Title = "Auto Sell All",
+    Icon = "shopping-cart",
+    Value = false,
+    Callback = function(state)
+        AutoSell = state
+    end
+})
+
+--------------------------------------------------
+-- AUTO SPEED TOGGLE
+--------------------------------------------------
+BUYSection:Toggle({
+    Title = "Auto Buy Speed",
+    Icon = "zap",
+    Value = false,
+    Callback = function(state)
+        AutoSpeed = state
+    end
+})
+
+BUYSection:Dropdown({
+    Title = "Speed Variant",
+    Desc = "Pilih speed 1 / 5 / 10",
+    Values = { "1", "5", "10" },
+    Value = "1",
+    Multi = false,
+    AllowNone = false,
+    Callback = function(val)
+        SpeedValue = tonumber(val)
+    end
+})
+
+--------------------------------------------------
+-- AUTO UPGRADE TOGGLE
+--------------------------------------------------
+UPSection:Toggle({
+    Title = "Auto Upgrade",
+    Icon = "arrow-up",
+    Value = false,
+    Callback = function(state)
+        AutoUpgrade = state
     end
 })
