@@ -59,6 +59,7 @@ local UPSection = MenuTab:Section({ Title = "UPGRADE BASE", Box = true, Opened =
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CarryEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Carry")
 local Events = ReplicatedStorage:WaitForChild("Events")
 local SellEvent    = Events:WaitForChild("SellDialogue")
 local SpeedEvent   = Events:WaitForChild("Speed")
@@ -72,7 +73,7 @@ local SelectedVariant = "Common"
 local AutoSell    = false
 local AutoSpeed   = false
 local AutoUpgrade = false
-
+local AutoCarry = false
 local SpeedValue = 1
 --------------------------------------------------
 -- BASE POSITION
@@ -197,6 +198,16 @@ task.spawn(function()
     end
 end)
 
+task.spawn(function()
+    while task.wait(1) do -- delay carry
+        if AutoCarry then
+            pcall(function()
+                CarryEvent:InvokeServer("Carry")
+            end)
+        end
+    end
+end)
+
 --------------------------------------------------
 -- AUTO UPGRADE ALL PLOTS (1–30)
 --------------------------------------------------
@@ -291,6 +302,16 @@ BUYSection:Dropdown({
         SpeedValue = tonumber(val)
     end
 })
+
+BUYSection:Toggle({
+    Title = "Buy Carry",
+    Icon = "hand",
+    Value = false,
+    Callback = function(state)
+        AutoCarry = state
+    end
+})
+
 
 --------------------------------------------------
 -- AUTO UPGRADE TOGGLE
