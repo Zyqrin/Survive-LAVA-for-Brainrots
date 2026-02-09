@@ -240,7 +240,7 @@ ManualSection:Dropdown({
         "Mythic",
         "Rare",
         "Secret",
-        "Celestial"
+        "Celestial",
         "Godly"
     },
     Value = "Common",
