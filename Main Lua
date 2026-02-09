@@ -93,6 +93,8 @@ local FolderMap = {
     Rare       = BrainrotsFolder:FindFirstChild("Rare"),
     Secret     = BrainrotsFolder:FindFirstChild("Secret"),
     Celestial  = BrainrotsFolder:FindFirstChild("Celestial"),
+    Godly  = BrainrotsFolder:FindFirstChild("Godly"),
+}
 }
 
 --------------------------------------------------
@@ -240,6 +242,7 @@ ManualSection:Dropdown({
         "Rare",
         "Secret",
         "Celestial"
+        "Godly"
     },
     Value = "Common",
     Multi = false,
