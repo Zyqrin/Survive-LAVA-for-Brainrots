@@ -95,7 +95,6 @@ local FolderMap = {
     Celestial  = BrainrotsFolder:FindFirstChild("Celestial"),
     Godly  = BrainrotsFolder:FindFirstChild("Godly"),
 }
-}
 
 --------------------------------------------------
 -- FUNCTIONS
